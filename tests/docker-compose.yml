@@ -1,0 +1,17 @@
+version: '3'
+services:
+  db:
+   image: amazon/dynamodb-local
+   ports:
+     - "8000:8000"
+  python:
+    depends_on:
+      - db
+    links:
+      - db:db
+    build:
+      context: ../
+      dockerfile: ./tests/Dockerfile.python
+    restart: always
+    env_file:
+      - python.env

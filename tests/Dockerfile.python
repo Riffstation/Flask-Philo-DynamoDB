@@ -1,0 +1,16 @@
+FROM alpine:latest
+MAINTAINER Manuel Ignacio Franco <maigfrga@gmail.com>
+USER root
+RUN apk add --update bash && rm -rf /var/cache/apk/*
+RUN apk add --update alpine-sdk
+
+RUN apk add --no-cache python3
+ADD ./tests/requirements.txt /requirements.txt
+
+RUN pip3 install --upgrade pip
+RUN pip3 install ipdb
+RUN pip3 install -r /requirements.txt
+
+ENV PYTHONPATH /src/pynamodb
+
+CMD ["tail", "-f", "/dev/null"]
