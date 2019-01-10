@@ -13,5 +13,3 @@ services:
       context: ../
       dockerfile: ./tests/Dockerfile.python
     restart: always
-    env_file:
-      - python.env
