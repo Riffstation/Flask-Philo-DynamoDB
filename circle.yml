@@ -25,11 +25,12 @@ jobs:
             curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
             chmod +x ~/docker-compose
             sudo mv ~/docker-compose /usr/local/bin/docker-compose
-            pip3 install -r tools/requirements.txt flake8
+            pip3 install -r tests/requirements.txt flake8
       - run:
           name: Running tests
           command: |
             flake8 --exclude config ./
+            cd tests
             python3 run_tests.py
 
   deployment_production:
