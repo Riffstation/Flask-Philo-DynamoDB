@@ -1,0 +1,40 @@
+defaults: &defaults
+  machine: true
+
+version: 2.0
+
+jobs:
+  test_only:
+    <<: *defaults
+    working_directory: ~/circleci-rfcommon
+    steps:
+      - checkout
+      - run:
+          name: Preparing env
+          command: |
+            pyenv install 3.6.3
+            pyenv global 3.6.3
+      - run:
+          name: Checking for secrets leak
+          command: |
+            git clone https://github.com/awslabs/git-secrets.git && cd git-secrets && sudo make install && cd ..
+            git secrets --register-aws ; git secrets --add '\-{5}BEGIN\ RSA\ PRIVATE\ KEY-{5}' ; git secrets --scan --scan-history -r .
+      - run:
+          name: Installing dependencies
+          command: |
+            curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
+            chmod +x ~/docker-compose
+            sudo mv ~/docker-compose /usr/local/bin/docker-compose
+            pip3 install -r tools/requirements.txt flake8
+      - run:
+          name: Running tests
+          command: |
+            flake8 --exclude config ./
+            python3 run_tests.py
+
+workflows:
+  version: 2
+
+  test_only:
+    jobs:
+      - test_only
