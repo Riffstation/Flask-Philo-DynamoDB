@@ -6,7 +6,7 @@ version: 2.0
 jobs:
   test_only:
     <<: *defaults
-    working_directory: ~/circleci-rfcommon
+    working_directory: ~/flask-philo-pynamodb
     steps:
       - checkout
       - run:
