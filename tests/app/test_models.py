@@ -6,6 +6,7 @@ from pynamodb.attributes import (
     UnicodeAttribute, NumberAttribute, UnicodeSetAttribute, UTCDateTimeAttribute
 )
 
+from flask_philo_pynamodb.attributes import UUIDAttribute
 from flask_philo_pynamodb.models import FlaskPynamoDBModel
 
 import random
@@ -20,6 +21,12 @@ class Thread(FlaskPynamoDBModel):
     replies = NumberAttribute(default=0)
     tags = UnicodeSetAttribute()
     last_post_datetime = UTCDateTimeAttribute()
+
+
+class ModelTest(FlaskPynamoDBModel):
+    class Meta:
+        table_name = 'ModelTest'
+    key = UUIDAttribute(hash_key=True)
 
 
 class Factory(BaseTestFactory):
@@ -73,16 +80,81 @@ class TestPynamoDBModels(FlaskPhiloTestCase):
         with self.app.app_context():
             Thread.create_table(read_capacity_units=1, write_capacity_units=1, wait=True)
             assert 0 == Thread.count()
-            obj = Factory.create_thread()
+            Factory.create_thread()
             assert 1 == Thread.count()
+
+    def test_get(self):
+        with self.app.app_context():
+            Thread.create_table(read_capacity_units=1, write_capacity_units=1, wait=True)
+            params = {
+                'forum_name': Factory.create_unique_string(),
+                'subject': Factory.create_unique_string()
+            }
+            Factory.create_thread(**params)
+            assert 1 == Thread.count()
+            obj = Thread.get(params['forum_name'], params['subject'])
+            assert obj.forum_name == params['forum_name']
+            assert obj.subject == params['subject']
 
     def test_update(self):
         with self.app.app_context():
             Thread.create_table(read_capacity_units=1, write_capacity_units=1, wait=True)
             params = {
                 'forum_name': Factory.create_unique_string(),
+                'subject': Factory.create_unique_string(),
+                'views': 1
             }
             Factory.create_thread(**params)
             assert 1 == Thread.count()
-            #obj = Thread.get(params['forum_name'])
-            import ipdb; ipdb.set_trace()
+            obj = Thread.get(params['forum_name'], params['subject'])
+            obj.views = 2
+            obj.save()
+            assert 1 == Thread.count()
+            obj2 = Thread.get(params['forum_name'], params['subject'])
+            assert obj2.views != 1
+            assert obj2.views == 2
+
+    def test_delete(self):
+        with self.app.app_context():
+            Thread.create_table(read_capacity_units=1, write_capacity_units=1, wait=True)
+            params = {
+                'forum_name': Factory.create_unique_string(),
+                'subject': Factory.create_unique_string()
+            }
+            Factory.create_thread(**params)
+            assert 1 == Thread.count()
+            obj = Thread.get(params['forum_name'], params['subject'])
+            obj.delete()
+            assert 0 == Thread.count()
+
+
+
+class TestAttributes(FlaskPhiloTestCase):
+    config =  {
+        'AWS': {
+            'AWS_REGION': 'us-west-2',
+            'AWS_ACCESS_KEY_ID': BaseTestFactory.create_unique_string(),
+            'AWS_SECRET_ACCESS_KEY': BaseTestFactory.create_unique_string(),
+        },
+        'PYNAMODB': {
+            'host': 'http://db:8000'
+        }
+
+    }
+
+    def teardown(self):
+        with self.app.app_context():
+            if ModelTest.exists():
+                ModelTest.delete_table()
+
+    def test_uuid(self):
+        with self.app.app_context():
+            assert (ModelTest.exists() is False)
+            ModelTest.create_table(read_capacity_units=1, write_capacity_units=1, wait=True)
+            assert 0 == ModelTest.count()
+            key = Factory.create_uuid()
+            obj = ModelTest(key)
+            obj.save()
+            assert 1 == ModelTest.count()
+            obj2 = ModelTest.get(key)
+            assert obj.key == obj2.key

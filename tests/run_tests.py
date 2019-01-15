@@ -1,11 +1,11 @@
 import argparse
 import subprocess
-import os
 
+import os
+import sys
 
 
 def main():
-    BASE_DIR = os.path.dirname(os.path.realpath(__file__))
     description = 'Run unit test in a docker environment'
     parser = argparse.ArgumentParser(description=description)
 
@@ -27,7 +27,11 @@ def main():
         '-c',
         test_cmd
     ]
-    subprocess.call(cmd)
+
+    try:
+        subprocess.check_call(cmd)
+    except subprocess.CalledProcessError:
+        sys.exit(1)
 
 
 if __name__ == '__main__':

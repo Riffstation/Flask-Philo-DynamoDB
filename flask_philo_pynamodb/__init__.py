@@ -24,9 +24,8 @@ def resolv_environment():
 
     elif 'AWS_REGION' in os.environ:
         attrs['AWS_REGION'] = os.environ['AWS_REGION']
-
     else:
-        raise ConfigurationError('AWS_REGION undefined')
+        attrs['AWS_REGION'] = get_settings_value(REGION)
 
     if 'AWS_ACCESS_KEY_ID' in aws_config:
         attrs['AWS_ACCESS_KEY_ID'] = aws_config['AWS_ACCESS_KEY_ID']
