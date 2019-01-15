@@ -32,6 +32,27 @@ jobs:
             flake8 --exclude config ./
             python3 run_tests.py
 
+  deployment_production:
+    <<: *defaults
+    working_directory: ~/flask-philo-pynamodb
+    steps:
+      - checkout
+      - run:
+          name: Preparing env
+          command: |
+              pyenv install 3.6.3
+              pyenv global 3.6.3
+      - run:
+          command: |
+            pip3 install -r ~/circleci-flaskphilo-sql/tests/requirements.txt
+            pip3 install --upgrade setuptools
+            sed -i "s/USER/$RIFF_USER/g" .pypirc 
+            sed -i "s/PASS/$RIFF_PASS/g" .pypirc 
+            sed -i "s/version=".*",/version=\'${CIRCLE_TAG}\',/" setup.py
+            cp .pypirc ~
+            python3 setup.py sdist upload -r pypi
+
+
 workflows:
   version: 2
 
