@@ -4,7 +4,7 @@ defaults: &defaults
 version: 2.0
 
 jobs:
-  test_only:
+  install_and_build:
     <<: *defaults
     working_directory: ~/flask-philo-pynamodb
     steps:
