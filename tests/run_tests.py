@@ -16,7 +16,6 @@ def main():
     test_cmd = 'cd /src/tests; flask-philo test --q {}'.format(
         args.q)
 
-    #test_cmd = 'ls /src'
     cmd = [
         'docker-compose',
         'run',

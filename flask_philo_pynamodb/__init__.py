@@ -51,9 +51,11 @@ def resolv_environment():
         attrs[HOST] = get_settings_value('host')
 
     if 'request_timeout_seconds' in pynamo_config:
-        attrs['request_timeout_seconds'] = pynamo_config['request_timeout_seconds']
+        attrs['request_timeout_seconds'] =\
+            pynamo_config['request_timeout_seconds']
     else:
-        attrs['request_timeout_seconds'] = get_settings_value('request_timeout_seconds')
+        attrs['request_timeout_seconds'] =\
+            get_settings_value('request_timeout_seconds')
 
     if 'base_backoff_ms' in pynamo_config:
         attrs['base_backoff_ms'] = pynamo_config['base_backoff_ms']
