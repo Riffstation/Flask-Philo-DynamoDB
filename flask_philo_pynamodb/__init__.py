@@ -5,6 +5,8 @@ from pynamodb.settings import get_settings_value
 
 import os
 
+__verson__ = '0.1.0'
+
 
 def resolv_environment():
     """
