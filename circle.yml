@@ -4,7 +4,7 @@ defaults: &defaults
 version: 2.0
 
 jobs:
-  test_only:
+  install_and_build:
     <<: *defaults
     working_directory: ~/flask-philo-pynamodb
     steps:
@@ -57,6 +57,28 @@ jobs:
 workflows:
   version: 2
 
-  test_only:
+  build-only:
     jobs:
-      - test_only
+      - install_and_build:
+          filters:
+            branches:
+              ignore:
+                - dev
+                - /feature\/.*
+  build-and-deploy-production:
+    jobs:
+      - install_and_build:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /[0-9]*\..*/
+
+      - deployment_production:
+          requires:
+            - install_and_build
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /[0-9]*\..*/
