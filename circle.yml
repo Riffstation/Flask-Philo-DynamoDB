@@ -45,7 +45,7 @@ jobs:
               pyenv global 3.6.3
       - run:
           command: |
-            pip3 install -r ~/circleci-flaskphilo-sql/tests/requirements.txt
+            pip3 install -r ~/flask-philo-pynamodb/tests/requirements.txt
             pip3 install --upgrade setuptools
             sed -i "s/USER/$RIFF_USER/g" .pypirc 
             sed -i "s/PASS/$RIFF_PASS/g" .pypirc 
