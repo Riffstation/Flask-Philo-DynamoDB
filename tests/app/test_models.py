@@ -3,7 +3,8 @@ from datetime import datetime
 from flask_philo_core.test import FlaskPhiloTestCase, BaseTestFactory
 
 from pynamodb.attributes import (
-    UnicodeAttribute, NumberAttribute, UnicodeSetAttribute, UTCDateTimeAttribute
+    UnicodeAttribute, NumberAttribute, UnicodeSetAttribute,
+    UTCDateTimeAttribute
 )
 
 from flask_philo_pynamodb.attributes import UUIDAttribute
@@ -51,7 +52,7 @@ class Factory(BaseTestFactory):
 
 
 class TestPynamoDBModels(FlaskPhiloTestCase):
-    config =  {
+    config = {
         'AWS': {
             'AWS_REGION': 'us-west-2',
             'AWS_ACCESS_KEY_ID': BaseTestFactory.create_unique_string(),
@@ -71,21 +72,24 @@ class TestPynamoDBModels(FlaskPhiloTestCase):
     def test_create_table(self):
         with self.app.app_context():
             assert (Thread.exists() is False)
-            Thread.create_table(read_capacity_units=1, write_capacity_units=1, wait=True)
+            Thread.create_table(
+                read_capacity_units=1, write_capacity_units=1, wait=True)
             assert Thread.exists()
             Thread.delete_table()
             assert (Thread.exists() is False)
 
     def test_create(self):
         with self.app.app_context():
-            Thread.create_table(read_capacity_units=1, write_capacity_units=1, wait=True)
+            Thread.create_table(
+                read_capacity_units=1, write_capacity_units=1, wait=True)
             assert 0 == Thread.count()
             Factory.create_thread()
             assert 1 == Thread.count()
 
     def test_get(self):
         with self.app.app_context():
-            Thread.create_table(read_capacity_units=1, write_capacity_units=1, wait=True)
+            Thread.create_table(
+                read_capacity_units=1, write_capacity_units=1, wait=True)
             params = {
                 'forum_name': Factory.create_unique_string(),
                 'subject': Factory.create_unique_string()
@@ -98,7 +102,8 @@ class TestPynamoDBModels(FlaskPhiloTestCase):
 
     def test_update(self):
         with self.app.app_context():
-            Thread.create_table(read_capacity_units=1, write_capacity_units=1, wait=True)
+            Thread.create_table(
+                read_capacity_units=1, write_capacity_units=1, wait=True)
             params = {
                 'forum_name': Factory.create_unique_string(),
                 'subject': Factory.create_unique_string(),
@@ -116,7 +121,8 @@ class TestPynamoDBModels(FlaskPhiloTestCase):
 
     def test_delete(self):
         with self.app.app_context():
-            Thread.create_table(read_capacity_units=1, write_capacity_units=1, wait=True)
+            Thread.create_table(
+                read_capacity_units=1, write_capacity_units=1, wait=True)
             params = {
                 'forum_name': Factory.create_unique_string(),
                 'subject': Factory.create_unique_string()
@@ -128,9 +134,8 @@ class TestPynamoDBModels(FlaskPhiloTestCase):
             assert 0 == Thread.count()
 
 
-
 class TestAttributes(FlaskPhiloTestCase):
-    config =  {
+    config = {
         'AWS': {
             'AWS_REGION': 'us-west-2',
             'AWS_ACCESS_KEY_ID': BaseTestFactory.create_unique_string(),
@@ -150,7 +155,8 @@ class TestAttributes(FlaskPhiloTestCase):
     def test_uuid(self):
         with self.app.app_context():
             assert (ModelTest.exists() is False)
-            ModelTest.create_table(read_capacity_units=1, write_capacity_units=1, wait=True)
+            ModelTest.create_table(
+                read_capacity_units=1, write_capacity_units=1, wait=True)
             assert 0 == ModelTest.count()
             key = Factory.create_uuid()
             obj = ModelTest(key)
